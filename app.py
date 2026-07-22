@@ -111,6 +111,30 @@ st.markdown(
 
     .footer-note {{ text-align: center; color: {MUTED}; font-size: 0.78rem; margin-top: 2.2rem; }}
     .footer-note b {{ color: {ACCENT_DEEP}; }}
+
+    /* ضمان وضوح فقاعات الشات (خلفية وخط) بغض النظر عن ثيم المتصفح */
+    div[data-testid="stChatMessage"] {{
+        background: {CARD} !important;
+        border: 1px solid #E9E0CC !important;
+        border-radius: 14px !important;
+        padding: 0.9rem 1.1rem !important;
+        margin-bottom: 0.7rem !important;
+    }}
+    div[data-testid="stChatMessage"] * {{
+        color: {TEXT} !important;
+    }}
+    div[data-testid="stChatMessage"] a {{ color: {PRIMARY_DARK} !important; }}
+
+    /* ضمان وضوح مربع الإعدادات المتقدمة (popover) */
+    div[data-testid="stPopoverBody"] {{
+        background: {CARD} !important; color: {TEXT} !important;
+    }}
+    div[data-testid="stPopoverBody"] * {{ color: {TEXT} !important; }}
+
+    /* ضمان وضوح خانة الكتابة أسفل الصفحة */
+    div[data-testid="stChatInput"] textarea {{
+        color: {TEXT} !important; background: {CARD} !important;
+    }}
     </style>
     """,
     unsafe_allow_html=True,
@@ -366,7 +390,8 @@ if not st.session_state.messages:
 # عرض المحادثة
 # ---------------------------------------------------------------------------
 for msg in st.session_state.messages:
-    with st.chat_message(msg["role"]):
+    avatar = "🏛️" if msg["role"] == "assistant" else "🙋"
+    with st.chat_message(msg["role"], avatar=avatar):
         st.markdown(msg["content"])
         if msg.get("context"):
             with st.expander("📄 المستندات المسترجعة"):
@@ -380,10 +405,10 @@ st.session_state.pending_query = None
 
 if query:
     st.session_state.messages.append({"role": "user", "content": query})
-    with st.chat_message("user"):
+    with st.chat_message("user", avatar="🙋"):
         st.markdown(query)
 
-    with st.chat_message("assistant"):
+    with st.chat_message("assistant", avatar="🏛️"):
         with st.spinner("جاري الاسترجاع..."):
             context = retrieve(query, active_mode["retriever"], k=active_mode["k"], alpha=active_mode["alpha"])
 
